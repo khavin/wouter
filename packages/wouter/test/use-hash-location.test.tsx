@@ -3,7 +3,7 @@ import { renderHook, render } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { Router, Route, useLocation, Link } from "wouter";
-import { useHashLocation } from "wouter/use-hash-location";
+import { useHashLocation, useSearch } from "wouter/use-hash-location";
 
 import { waitForHashChangeEvent } from "./test-utils";
 import { ReactNode, useSyncExternalStore } from "react";
@@ -23,6 +23,14 @@ it("gets current location from `location.hash`", () => {
 
 it("isn't sensitive to leading slash", () => {
   location.hash = "app/users";
+  const { result } = renderHook(() => useHashLocation());
+  const [path] = result.current;
+
+  expect(path).toBe("/app/users");
+});
+
+it("isn't sensitive to query string", () => {
+  location.hash = "/app/users?foo=bar";
   const { result } = renderHook(() => useHashLocation());
   const [path] = result.current;
 
@@ -195,4 +203,17 @@ it("defines a custom way of rendering link hrefs", () => {
   );
 
   expect(getByTestId("link")).toHaveAttribute("href", "#/app");
+});
+
+it("useSearch returns correct query string when useHashLocation is used", () => {
+  location.hash = "/";
+  const { result } = renderHook(() => useHashLocation());
+  const [, navigate] = result.current;
+
+  navigate("/?hello=world");
+  const {
+    result: { current: search },
+  } = renderHook(() => useSearch());
+
+  expect(search).toBe("hello=world");
 });
