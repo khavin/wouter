@@ -19,52 +19,31 @@ const subscribeToHashUpdates = (callback) => {
   };
 };
 
-export const useLocationProperty = (fn, ssrFn) =>
-  useSyncExternalStore(subscribeToHashUpdates, fn, ssrFn);
-
-// when useHashLocation is used, location.search is always empty
-// so we must retrieve string from the hash
-const currentSearch = () => {
-  const hash = location.hash;
-  const hashLocation = "/" + hash.replace(/^#?\/?/, "");
-
-  const questionMarkIdx = hashLocation.indexOf("?");
-  if (questionMarkIdx !== -1) {
-    return hashLocation.slice(questionMarkIdx + 1, hashLocation.length);
-  }
-
-  return "";
-};
-
-export const useSearch = ({ ssrSearch = "" } = {}) =>
-  useLocationProperty(currentSearch, () => ssrSearch);
-
 // leading '#' is ignored, leading '/' is optional
-const currentHashLocation = () => {
-  const hash = location.hash;
-  const hashLocation = "/" + hash.replace(/^#?\/?/, "");
-
-  // remove query string
-  const questionMarkIdx = hashLocation.indexOf("?");
-  if (questionMarkIdx !== -1) {
-    return hashLocation.slice(0, questionMarkIdx);
-  }
-
-  return hashLocation;
-};
+const currentHashLocation = () => "/" + location.hash.replace(/^#?\/?/, "");
 
 export const navigate = (to, { state = null } = {}) => {
   // calling `replaceState` allows us to set the history
   // state without creating an extra entry
+
+  let hash = to.replace(/^#?\/?/, "");
+  let search = location.search;
+
+  const searchIdx = hash.indexOf("?");
+  if (searchIdx !== -1) {
+    search = hash.slice(searchIdx, hash.length);
+    hash = hash.slice(0, searchIdx);
+  }
+
   history.replaceState(
     state,
     "",
-    // keep the current pathname, current query string, but replace the hash
+    // keep the current pathname, but replace query string and hash
     location.pathname +
-      location.search +
+      search +
       // update location hash, this will cause `hashchange` event to fire
       // normalise the value before updating, so it's always preceeded with "#/"
-      (location.hash = `#/${to.replace(/^#?\/?/, "")}`)
+      (location.hash = `#/${hash}`)
   );
 };
 
