@@ -64,7 +64,7 @@ it("should not rerender when pathname changes", () => {
   expect(result.current).toBe(1);
 });
 
-it("does not change anything besides the hash", () => {
+it("does not change anything besides the hash when doesn't contain ? symbol", () => {
   history.replaceState(null, "", "/foo?bar#/app");
 
   const { result } = renderHook(() => useHashLocation());
@@ -73,6 +73,18 @@ it("does not change anything besides the hash", () => {
   navigate("/settings/general");
   expect(location.pathname).toBe("/foo");
   expect(location.search).toBe("?bar");
+});
+
+it("changes search and hash when contains ? symbol", () => {
+  history.replaceState(null, "", "/foo?bar#/app");
+
+  const { result } = renderHook(() => useHashLocation());
+  const [, navigate] = result.current;
+
+  navigate("/abc?def");
+  expect(location.pathname).toBe("/foo");
+  expect(location.search).toBe("?def");
+  expect(location.hash).toBe("#/abc");
 });
 
 it("creates a new history entry when navigating", () => {
