@@ -25,22 +25,14 @@ const currentHashLocation = () => "/" + location.hash.replace(/^#?\/?/, "");
 export const navigate = (to, { state = null } = {}) => {
   // calling `replaceState` allows us to set the history
   // state without creating an extra entry
-
-  let hash = to.replace(/^#?\/?/, "");
-  let search = location.search;
-
-  const searchIdx = hash.indexOf("?");
-  if (searchIdx !== -1) {
-    search = hash.slice(searchIdx, hash.length);
-    hash = hash.slice(0, searchIdx);
-  }
+  const [hash, search] = to.replace(/^#?\/?/, "").split("?");
 
   history.replaceState(
     state,
     "",
     // keep the current pathname, but replace query string and hash
     location.pathname +
-      search +
+      (search ? `?${search}` : location.search) +
       // update location hash, this will cause `hashchange` event to fire
       // normalise the value before updating, so it's always preceeded with "#/"
       (location.hash = `#/${hash}`)
