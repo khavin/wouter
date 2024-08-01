@@ -70,7 +70,7 @@ projects that use wouter: **[Ultra](https://ultrajs.dev/)**,
   - [`<Link href={path} />`](#link-hrefpath-)
   - [`<Switch />`](#switch-)
   - [`<Redirect to={path} />`](#redirect-topath-)
-  - [`<Router hook={hook} parser={fn} base={basepath} />`](#router-hookhook-parserfn-basebasepath-)
+  - [`<Router hook={hook} parser={fn} base={basepath} />`](#router-hookhook-parserfn-basebasepath-hrefsfn-)
 
 - [FAQ and Code Recipes](#faq-and-code-recipes)
   - [I deploy my app to the subfolder. Can I specify a base path?](#i-deploy-my-app-to-the-subfolder-can-i-specify-a-base-path)
