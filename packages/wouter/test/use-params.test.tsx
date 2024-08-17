@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { it, expect } from "vitest";
-import { useParams, Router, Route } from "wouter";
+import { useParams, Router, Route, Switch } from "wouter";
 
 import { memoryLocation } from "wouter/memory-location";
 
@@ -163,4 +163,23 @@ it("works when the route becomes matching", () => {
 
   act(() => navigate("/123"));
   expect(result.current).toMatchObject({ id: "123" });
+});
+
+it("makes the params an empty object, when there are no path params", () => {
+  const { hook, navigate } = memoryLocation({ path: "/" });
+
+  const { result } = renderHook(() => useParams(), {
+    wrapper: (props) => (
+      <Router hook={hook}>
+        <Switch>
+          <Route path="/posts">{props.children}</Route>
+          <Route path="/posts/:a">{props.children}</Route>
+        </Switch>
+      </Router>
+    ),
+  });
+
+  act(() => navigate("/posts/all"));
+  act(() => navigate("/posts"));
+  expect(Object.keys(result.current).length).toBe(0);
 });

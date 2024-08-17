@@ -198,6 +198,7 @@ const useCachedParams = (value) => {
     curr = prev.current;
 
   for (const k in value) if (value[k] !== curr[k]) curr = value;
+  if (Object.keys(value).length === 0) curr = value;
   return (prev.current = curr);
 };
 
